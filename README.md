@@ -4,18 +4,21 @@ Este proyecto implementa un asistente virtual inteligente para tiendas Tiendanub
 
 ## Características
 
-- Integración con Tiendanube API
-- Procesamiento de lenguaje natural con Redpill.ai
+- Integración con Redpill.ai para procesamiento de lenguaje natural
 - Interfaz de chat interactiva
 - Recomendaciones de productos
 - Soporte al cliente
 - Información de productos
 - Consultas de precios
+- Sistema de caché para mejorar el rendimiento
+- Validación de datos para garantizar la integridad
+- Sistema de logging para monitoreo y depuración
+- Rate limiting para proteger contra abusos
+- Documentación de API integrada
 
 ## Requisitos
 
 - Node.js (v14 o superior)
-- Cuenta en Tiendanube con API habilitada
 - Cuenta en Redpill.ai con API key
 
 ## Instalación
@@ -34,15 +37,48 @@ npm install
 3. Configurar variables de entorno:
    - Copiar `.env.example` a `.env`
    - Completar las variables con tus credenciales:
-     - TIENDANUBE_API_KEY
-     - TIENDANUBE_API_SECRET
-     - TIENDANUBE_STORE_ID
      - REDPILL_API_KEY
+     - NODE_ENV (opcional, por defecto es 'development')
 
 4. Iniciar el servidor:
 ```bash
 npm start
 ```
+
+## Estructura del Proyecto
+
+```
+ai-cosmetik/
+├── data/                  # Datos de productos
+│   └── products.json      # Archivo JSON con productos
+├── logs/                  # Archivos de log
+│   ├── error.log          # Log de errores
+│   └── combined.log       # Log general
+├── public/                # Archivos estáticos
+│   ├── index.html         # Interfaz del chat
+│   ├── styles.css         # Estilos
+│   └── app.js             # Lógica del cliente
+├── .env                   # Variables de entorno
+├── .env.example           # Plantilla de variables de entorno
+├── index.js               # Servidor principal
+├── package.json           # Dependencias y scripts
+└── README.md              # Documentación
+```
+
+## API Endpoints
+
+### Documentación de API
+- `GET /api/docs` - Obtiene documentación de la API
+
+### Asistente Virtual
+- `POST /api/assistant` - Procesa un mensaje del usuario y devuelve una respuesta del asistente
+  - Request: `{ "message": "texto del mensaje" }`
+  - Response: `{ "message": "respuesta del asistente", "products": [...] }`
+
+### Productos
+- `GET /api/products` - Obtiene la lista de productos disponibles
+- `POST /api/products/update` - Actualiza la lista de productos
+  - Request: `{ "products": [...] }`
 
 ## Integración en Tiendanube
 
@@ -58,16 +94,6 @@ npm start
 </script>
 ```
 
-## Uso
-
-El asistente virtual aparecerá como un widget flotante en la esquina inferior derecha de tu tienda. Los usuarios pueden:
-
-- Hacer preguntas sobre productos
-- Solicitar recomendaciones
-- Consultar precios
-- Obtener información de productos
-- Recibir soporte al cliente
-
 ## Personalización
 
 Puedes personalizar la apariencia del asistente modificando los archivos:
@@ -75,9 +101,17 @@ Puedes personalizar la apariencia del asistente modificando los archivos:
 - `public/index.html` para la estructura
 - `public/app.js` para la funcionalidad
 
+## Monitoreo y Mantenimiento
+
+El sistema incluye:
+- Logs detallados en la carpeta `logs/`
+- Rate limiting para proteger contra abusos
+- Validación de datos para garantizar la integridad
+- Sistema de caché para mejorar el rendimiento
+
 ## Soporte
 
-Para soporte técnico o consultas, por favor contacta a [mauroere@gmail.com]
+Para soporte técnico o consultas, por favor contacta a [tu-email@dominio.com]
 
 ## Licencia
 
