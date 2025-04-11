@@ -22,7 +22,7 @@ const tiendanubeConfig = {
 // Configuración de Redpill.ai
 const redpillConfig = {
     apiKey: process.env.REDPILL_API_KEY,
-    baseURL: 'https://api.redpill.ai/v1'
+    baseURL: 'https://api.redpill.ai/api/v1'
 };
 
 // Ruta para procesar mensajes del asistente
@@ -31,9 +31,18 @@ app.post('/api/assistant', async (req, res) => {
         const { message } = req.body;
         
         // Procesar el mensaje con Redpill.ai
-        const redpillResponse = await axios.post(`${redpillConfig.baseURL}/process`, {
-            message,
-            apiKey: redpillConfig.apiKey
+        const redpillResponse = await axios.post(`${redpillConfig.baseURL}/chat/completions`, {
+            messages: [{
+                role: "user",
+                content: message
+            }],
+            model: "gpt-3.5-turbo",
+            temperature: 0.7
+        }, {
+            headers: {
+                'Authorization': `Bearer ${redpillConfig.apiKey}`,
+                'Content-Type': 'application/json'
+            }
         });
 
         // Obtener productos relevantes de Tiendanube
@@ -45,14 +54,17 @@ app.post('/api/assistant', async (req, res) => {
 
         // Procesar la respuesta y generar una respuesta adecuada
         const response = {
-            message: redpillResponse.data.response,
+            message: redpillResponse.data.choices[0].message.content,
             products: productsResponse.data.products
         };
 
         res.json(response);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Error al procesar la solicitud' });
+        console.error('Error:', error.response?.data || error.message);
+        res.status(500).json({ 
+            error: 'Error al procesar la solicitud',
+            details: error.response?.data || error.message
+        });
     }
 });
 
@@ -66,8 +78,11 @@ app.get('/api/products', async (req, res) => {
         });
         res.json(response.data);
     } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Error al obtener productos' });
+        console.error('Error:', error.response?.data || error.message);
+        res.status(500).json({ 
+            error: 'Error al obtener productos',
+            details: error.response?.data || error.message
+        });
     }
 });
 
