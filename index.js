@@ -22,7 +22,7 @@ const tiendanubeConfig = {
 // Configuración de Redpill.ai
 const redpillConfig = {
     apiKey: process.env.REDPILL_API_KEY,
-    baseURL: 'https://api.redpill.ai/v1/chat/completion'  // URL corregida según documentación
+    baseURL: 'https://api.redpill.ai'  // URL base
 };
 
 // Ruta para procesar mensajes del asistente
@@ -31,7 +31,7 @@ app.post('/api/assistant', async (req, res) => {
         const { message } = req.body;
         
         // Procesar el mensaje con Redpill.ai
-        const redpillResponse = await axios.post(redpillConfig.baseURL, {
+        const redpillResponse = await axios.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
             messages: [{
                 role: "user",
                 content: message
@@ -65,7 +65,8 @@ app.post('/api/assistant', async (req, res) => {
             message: error.message,
             response: error.response?.data,
             status: error.response?.status,
-            headers: error.response?.headers
+            headers: error.response?.headers,
+            url: error.config?.url
         });
         res.status(500).json({ 
             error: 'Error al procesar la solicitud',
