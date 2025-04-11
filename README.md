@@ -77,7 +77,7 @@ Puedes personalizar la apariencia del asistente modificando los archivos:
 
 ## Soporte
 
-Para soporte técnico o consultas, por favor contacta a [tu-email@dominio.com]
+Para soporte técnico o consultas, por favor contacta a [mauroere@gmail.com]
 
 ## Licencia
 
