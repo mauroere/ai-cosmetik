@@ -24,13 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
         products.forEach(product => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
+            
+            // Usar una imagen de placeholder si la imagen del producto no se puede cargar
+            const imgElement = document.createElement('img');
+            imgElement.alt = product.name;
+            imgElement.onerror = function() {
+                this.src = '/images/placeholder.jpg';
+                this.onerror = null; // Evitar bucle infinito
+            };
+            imgElement.src = product.image;
+            
             productCard.innerHTML = `
-                <img src="${product.image}" alt="${product.name}">
                 <h3>${product.name}</h3>
                 <p class="price">$${product.price}</p>
                 <p class="description">${product.description}</p>
                 <a href="#" target="_blank">Ver producto</a>
             `;
+            
+            // Insertar la imagen al principio del productCard
+            productCard.insertBefore(imgElement, productCard.firstChild);
+            
             productsDiv.appendChild(productCard);
         });
 
@@ -54,13 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Enviando solicitud a:', apiUrl);
 
+            // Configurar un timeout para la solicitud
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos de timeout
+
             const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message })
+                body: JSON.stringify({ message }),
+                signal: controller.signal
             });
+
+            // Limpiar el timeout
+            clearTimeout(timeoutId);
 
             // Eliminar el indicador de carga
             chatMessages.removeChild(loadingMessage);
@@ -88,7 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Si es un error de red y no hemos excedido los reintentos, intentar nuevamente
             if ((error.message.includes('Failed to fetch') || 
                  error.message.includes('Network Error') || 
-                 error.message.includes('connection')) && 
+                 error.message.includes('connection') ||
+                 error.name === 'AbortError') && 
                 retryCount < 3) {
                 
                 addMessage('Reintentando conexión...');

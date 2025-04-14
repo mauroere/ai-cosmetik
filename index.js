@@ -78,6 +78,11 @@ const axiosInstance = axios.create({
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json'
+    },
+    // Agregar opciones para manejar problemas de red
+    maxRedirects: 5,
+    validateStatus: function (status) {
+        return status >= 200 && status < 500; // Aceptar cualquier respuesta que no sea un error 500
     }
 });
 
@@ -89,7 +94,7 @@ axiosInstance.interceptors.response.use(
             logger.error('Timeout en la solicitud a la API', { error: error.message });
             throw new Error('La solicitud tardó demasiado tiempo en completarse');
         }
-        if (error.code === 'ERR_CONNECTION_RESET' || error.message.includes('Failed to fetch')) {
+        if (error.code === 'ERR_CONNECTION_RESET' || error.message.includes('Failed to fetch') || error.code === 'ERR_CONNECTION_ABORTED') {
             logger.error('Conexión reseteada con la API', { error: error.message });
             throw new Error('Error de conexión con el servicio');
         }

@@ -1,0 +1,7 @@
+Este directorio debe contener las siguientes imágenes:
+
+1. crema-hidratante.jpg
+2. serum-anti-edad.jpg
+3. mascarilla-purificante.jpg
+
+Por favor, agrega imágenes reales de los productos o usa imágenes de placeholder. 
