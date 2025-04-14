@@ -199,11 +199,18 @@ app.post('/api/assistant', async (req, res) => {
         const { message } = req.body;
         
         if (!message || typeof message !== 'string') {
-          return res.status(400).json({ error: 'Mensaje inválido' });
+            logger.error('Mensaje inválido recibido', { message });
+            return res.status(400).json({ error: 'Mensaje inválido' });
         }
         
         logger.info('Procesando mensaje del asistente', { message });
         
+        // Verificar que tenemos la API key
+        if (!redpillConfig.apiKey) {
+            logger.error('API key no configurada');
+            return res.status(500).json({ error: 'Error de configuración del servidor' });
+        }
+
         // Procesar el mensaje con Redpill.ai
         const redpillResponse = await axios.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
             messages: [{
@@ -220,6 +227,11 @@ app.post('/api/assistant', async (req, res) => {
             }
         });
 
+        logger.info('Respuesta recibida de Redpill.ai', { 
+            status: redpillResponse.status,
+            data: redpillResponse.data
+        });
+
         // Procesar la respuesta y generar una respuesta adecuada
         const response = {
             message: redpillResponse.data.choices[0].message.content,
@@ -227,8 +239,8 @@ app.post('/api/assistant', async (req, res) => {
         };
 
         logger.info('Respuesta del asistente generada', { 
-          userMessage: message,
-          assistantResponse: response.message
+            userMessage: message,
+            assistantResponse: response.message
         });
 
         res.json(response);
@@ -236,9 +248,11 @@ app.post('/api/assistant', async (req, res) => {
         logger.error('Error al procesar mensaje del asistente', {
             message: error.message,
             response: error.response?.data,
-            status: error.response?.status
+            status: error.response?.status,
+            stack: error.stack
         });
         
+        // Enviar una respuesta más específica al cliente
         res.status(500).json({ 
             error: 'Error al procesar la solicitud',
             details: error.response?.data || error.message
