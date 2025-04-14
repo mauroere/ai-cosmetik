@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="600" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Fondo -->
+    <rect width="600" height="600" rx="150" fill="#007BFF"/>
+    
+    <!-- Círculo de gradiente -->
+    <circle cx="300" cy="300" r="250" fill="url(#gradient)"/>
+    
+    <!-- Burbuja de chat -->
+    <path d="M450 250C450 338.366 378.366 410 290 410H280L220 470V410C131.634 410 60 338.366 60 250C60 161.634 131.634 90 220 90H290C378.366 90 450 161.634 450 250Z" fill="white"/>
+    
+    <!-- Texto "AI" -->
+    <text x="180" y="320" font-family="Arial Black" font-size="160" font-weight="bold" fill="#007BFF">
+        AI
+    </text>
+    
+    <!-- Definición del gradiente -->
+    <defs>
+        <linearGradient id="gradient" x1="0" y1="0" x2="600" y2="600" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0056b3"/>
+            <stop offset="100%" stop-color="#007BFF"/>
+        </linearGradient>
+    </defs>
+</svg> 

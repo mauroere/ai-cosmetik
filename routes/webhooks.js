@@ -1,60 +1,83 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
 const logger = require('../utils/logger');
 
-// Middleware para verificar la autenticidad del webhook
-const verifyTiendanubeWebhook = (req, res, next) => {
-    const userAgent = req.headers['user-agent'];
-    if (!userAgent || !userAgent.includes('Nuvemshop')) {
-        return res.status(401).json({ error: 'User-Agent inválido' });
-    }
-    next();
+// Middleware para verificar la firma del webhook
+const verifyWebhookSignature = (req, res, next) => {
+  const signature = req.headers['x-tiendanube-signature'];
+  if (!signature) {
+    return res.status(401).json({ error: 'No signature provided' });
+  }
+
+  const payload = JSON.stringify(req.body);
+  const expectedSignature = crypto
+    .createHmac('sha256', process.env.TIENDANUBE_CLIENT_SECRET)
+    .update(payload)
+    .digest('hex');
+
+  if (signature !== expectedSignature) {
+    return res.status(401).json({ error: 'Invalid signature' });
+  }
+
+  next();
 };
 
-// Manejador para la instalación de la app
-router.post('/installed', verifyTiendanubeWebhook, async (req, res) => {
-    try {
-        const { store_id, access_token, user_id } = req.body;
-        
-        logger.info('Nueva instalación de tienda', {
-            store_id,
-            user_id
-        });
+// Ruta para manejar eventos de productos
+router.post('/products', verifyWebhookSignature, async (req, res) => {
+  try {
+    const { event, product } = req.body;
+    logger.info(`Received product webhook: ${event}`, { product });
 
-        // Guardar los datos de la tienda en la base de datos
-        await storeService.saveStore({
-            store_id,
-            access_token,
-            user_id,
-            status: 'active',
-            installed_at: new Date()
-        });
-
-        res.status(200).json({ message: 'Instalación exitosa' });
-    } catch (error) {
-        logger.error('Error en instalación de tienda', { error: error.message });
-        res.status(500).json({ error: 'Error en la instalación' });
+    switch (event) {
+      case 'product/created':
+        // Manejar creación de producto
+        break;
+      case 'product/updated':
+        // Manejar actualización de producto
+        break;
+      case 'product/deleted':
+        // Manejar eliminación de producto
+        break;
+      default:
+        logger.warn(`Unhandled product event: ${event}`);
     }
+
+    res.status(200).json({ message: 'Webhook processed successfully' });
+  } catch (error) {
+    logger.error('Error processing product webhook:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Manejador para la desinstalación de la app
-router.post('/uninstalled', verifyTiendanubeWebhook, async (req, res) => {
-    try {
-        const { store_id } = req.body;
-        
-        logger.info('Desinstalación de tienda', { store_id });
+// Ruta para manejar eventos de órdenes
+router.post('/orders', verifyWebhookSignature, async (req, res) => {
+  try {
+    const { event, order } = req.body;
+    logger.info(`Received order webhook: ${event}`, { order });
 
-        // Actualizar el estado de la tienda en la base de datos
-        await storeService.updateStore(store_id, {
-            status: 'inactive',
-            uninstalled_at: new Date()
-        });
-
-        res.status(200).json({ message: 'Desinstalación exitosa' });
-    } catch (error) {
-        logger.error('Error en desinstalación de tienda', { error: error.message });
-        res.status(500).json({ error: 'Error en la desinstalación' });
+    switch (event) {
+      case 'order/created':
+        // Manejar nueva orden
+        break;
+      case 'order/paid':
+        // Manejar orden pagada
+        break;
+      case 'order/fulfilled':
+        // Manejar orden completada
+        break;
+      case 'order/cancelled':
+        // Manejar orden cancelada
+        break;
+      default:
+        logger.warn(`Unhandled order event: ${event}`);
     }
+
+    res.status(200).json({ message: 'Webhook processed successfully' });
+  } catch (error) {
+    logger.error('Error processing order webhook:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 module.exports = router; 

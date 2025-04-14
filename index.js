@@ -12,8 +12,12 @@ const jwt = require('jsonwebtoken');
 const storeContext = require('./data/assistant-context');
 const tiendanubeService = require('./services/tiendanubeService');
 const logger = require('./utils/logger');
+const { initializeDirectories } = require('./utils/init');
 
 const app = express();
+
+// Initialize required directories
+initializeDirectories();
 
 // Middleware
 app.use(cors());
