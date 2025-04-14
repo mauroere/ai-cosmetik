@@ -36,18 +36,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
-// Configuración de trust proxy
-app.set('trust proxy', 1);
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // límite de 100 solicitudes por ventana
-  keyGenerator: (req) => {
-    return req.ip; // Usar IP directamente en lugar de X-Forwarded-For
-  }
-});
-app.use('/api/', limiter);
+// Comentamos temporalmente el rate limiter hasta resolver el problema de instalación
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000,
+//   max: 100,
+//   standardHeaders: false,
+//   legacyHeaders: false,
+//   skip: (req) => false
+// });
+// app.use('/api/', limiter);
 
 // Middleware de autenticación
 const authenticateToken = (req, res, next) => {
