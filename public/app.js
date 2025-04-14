@@ -25,10 +25,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const productCard = document.createElement('div');
             productCard.className = 'product-card';
             productCard.innerHTML = `
-                <img src="${product.images[0]?.src || 'placeholder.jpg'}" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}">
                 <h3>${product.name}</h3>
                 <p class="price">$${product.price}</p>
-                <a href="${product.permalink}" target="_blank">Ver producto</a>
+                <p class="description">${product.description}</p>
+                <a href="#" target="_blank">Ver producto</a>
             `;
             productsDiv.appendChild(productCard);
         });
@@ -38,8 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función para enviar mensaje al servidor
-    async function sendMessage(message) {
+    async function sendMessage(message, retryCount = 0) {
         try {
+            // Mostrar indicador de carga
+            const loadingMessage = document.createElement('div');
+            loadingMessage.className = 'message assistant';
+            loadingMessage.textContent = 'Procesando tu mensaje...';
+            chatMessages.appendChild(loadingMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
             const response = await fetch('/api/assistant', {
                 method: 'POST',
                 headers: {
@@ -47,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ message })
             });
+
+            // Eliminar el indicador de carga
+            chatMessages.removeChild(loadingMessage);
 
             const data = await response.json();
             
@@ -67,6 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error:', error);
+            
+            // Si es un error de red y no hemos excedido los reintentos, intentar nuevamente
+            if ((error.message.includes('Failed to fetch') || 
+                 error.message.includes('Network Error') || 
+                 error.message.includes('connection')) && 
+                retryCount < 3) {
+                
+                addMessage('Reintentando conexión...');
+                setTimeout(() => {
+                    sendMessage(message, retryCount + 1);
+                }, 2000); // Esperar 2 segundos antes de reintentar
+                return;
+            }
+            
+            // Si hemos excedido los reintentos o es otro tipo de error
             addMessage(`Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta nuevamente en unos momentos.`);
         }
     }

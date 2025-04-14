@@ -69,8 +69,38 @@ const authenticateToken = (req, res, next) => {
 // Configuración de Redpill.ai
 const redpillConfig = {
     apiKey: process.env.REDPILL_API_KEY,
-    baseURL: 'https://api.redpill.ai'  // URL base
+    baseURL: 'https://api.openai.com',  // Cambiado a la URL correcta de OpenAI
+    timeout: 30000 // 30 segundos de timeout
 };
+
+// Configuración de axios
+const axiosInstance = axios.create({
+    timeout: 30000,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
+// Interceptor para manejar errores de red
+axiosInstance.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.code === 'ECONNABORTED') {
+            logger.error('Timeout en la solicitud a la API', { error: error.message });
+            throw new Error('La solicitud tardó demasiado tiempo en completarse');
+        }
+        if (error.code === 'ERR_CONNECTION_RESET' || error.message.includes('Failed to fetch')) {
+            logger.error('Conexión reseteada con la API', { error: error.message });
+            throw new Error('Error de conexión con el servicio');
+        }
+        logger.error('Error en la solicitud a la API', { 
+            error: error.message,
+            response: error.response?.data,
+            status: error.response?.status
+        });
+        throw error;
+    }
+);
 
 // Esquema de validación para productos
 const productSchema = Joi.object({
@@ -211,8 +241,8 @@ app.post('/api/assistant', async (req, res) => {
             return res.status(500).json({ error: 'Error de configuración del servidor' });
         }
 
-        // Procesar el mensaje con Redpill.ai
-        const redpillResponse = await axios.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
+        // Procesar el mensaje con la API
+        const apiResponse = await axiosInstance.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
             messages: [{
                 role: "user",
                 content: message
@@ -222,25 +252,24 @@ app.post('/api/assistant', async (req, res) => {
             max_tokens: 150
         }, {
             headers: {
-                'Authorization': `Bearer ${redpillConfig.apiKey}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${redpillConfig.apiKey}`
             }
         });
 
-        logger.info('Respuesta recibida de Redpill.ai', { 
-            status: redpillResponse.status,
-            data: redpillResponse.data
+        logger.info('Respuesta recibida de la API', { 
+            status: apiResponse.status,
+            data: apiResponse.data
         });
 
         // Verificar que la respuesta tiene la estructura esperada
-        if (!redpillResponse.data || !redpillResponse.data.choices || !redpillResponse.data.choices[0] || !redpillResponse.data.choices[0].message) {
-            logger.error('Respuesta inválida de Redpill.ai', { response: redpillResponse.data });
+        if (!apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices[0] || !apiResponse.data.choices[0].message) {
+            logger.error('Respuesta inválida de la API', { response: apiResponse.data });
             return res.status(500).json({ error: 'Respuesta inválida del servicio de IA' });
         }
 
         // Procesar la respuesta y generar una respuesta adecuada
         const response = {
-            message: redpillResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
+            message: apiResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
             products: getProducts() // Usar función con caché
         };
 
