@@ -232,9 +232,15 @@ app.post('/api/assistant', async (req, res) => {
             data: redpillResponse.data
         });
 
+        // Verificar que la respuesta tiene la estructura esperada
+        if (!redpillResponse.data || !redpillResponse.data.choices || !redpillResponse.data.choices[0] || !redpillResponse.data.choices[0].message) {
+            logger.error('Respuesta inválida de Redpill.ai', { response: redpillResponse.data });
+            return res.status(500).json({ error: 'Respuesta inválida del servicio de IA' });
+        }
+
         // Procesar la respuesta y generar una respuesta adecuada
         const response = {
-            message: redpillResponse.data.choices[0].message.content,
+            message: redpillResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
             products: getProducts() // Usar función con caché
         };
 

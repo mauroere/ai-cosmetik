@@ -51,11 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (!response.ok) {
-                throw new Error(data.error || 'Error en la comunicación con el servidor');
+                throw new Error(data.error || data.details || 'Error en la comunicación con el servidor');
             }
             
             // Mostrar respuesta del asistente
-            addMessage(data.message);
+            if (data.message) {
+                addMessage(data.message);
+            } else {
+                throw new Error('No se recibió una respuesta válida del asistente');
+            }
             
             // Si hay productos, mostrarlos
             if (data.products && data.products.length > 0) {
@@ -63,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            addMessage(`Lo siento, hubo un error: ${error.message}. Por favor, intenta nuevamente.`);
+            addMessage(`Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta nuevamente en unos momentos.`);
         }
     }
 
