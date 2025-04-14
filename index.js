@@ -69,20 +69,16 @@ const authenticateToken = (req, res, next) => {
 // Configuración de Redpill.ai
 const redpillConfig = {
     apiKey: process.env.REDPILL_API_KEY,
-    baseURL: 'https://api.openai.com',  // Cambiado a la URL correcta de OpenAI
+    baseURL: 'https://api.redpill.ai/v1',  // URL base correcta de Redpill.ai
     timeout: 30000 // 30 segundos de timeout
 };
 
 // Configuración de axios
 const axiosInstance = axios.create({
-    timeout: 30000,
+    baseURL: redpillConfig.baseURL,
+    timeout: redpillConfig.timeout,
     headers: {
         'Content-Type': 'application/json'
-    },
-    // Agregar opciones para manejar problemas de red
-    maxRedirects: 5,
-    validateStatus: function (status) {
-        return status >= 200 && status < 500; // Aceptar cualquier respuesta que no sea un error 500
     }
 });
 
@@ -251,12 +247,12 @@ app.post('/api/assistant', async (req, res) => {
 
         // Procesar el mensaje con la API
         try {
-            const apiResponse = await axiosInstance.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
+            const apiResponse = await axiosInstance.post('/chat/completions', {
                 messages: [{
                     role: "user",
                     content: message
                 }],
-                model: "gpt-3.5-turbo",
+                model: "anthropic/claude-3.7-sonnet", // Modelo correcto de Redpill.ai
                 temperature: 0.7,
                 max_tokens: 150
             }, {
