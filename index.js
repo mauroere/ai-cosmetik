@@ -13,6 +13,8 @@ const storeContext = require('./data/assistant-context');
 const tiendanubeService = require('./services/tiendanubeService');
 const logger = require('./utils/logger');
 const { initializeDirectories } = require('./utils/init');
+const productsRouter = require('./routes/products');
+const storeRouter = require('./routes/store');
 
 const app = express();
 
@@ -579,6 +581,9 @@ app.use((err, req, res, next) => {
         message: process.env.NODE_ENV === 'development' ? err.message : 'Ha ocurrido un error'
     });
 });
+
+app.use('/api/products', productsRouter);
+app.use('/api/store', storeRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
