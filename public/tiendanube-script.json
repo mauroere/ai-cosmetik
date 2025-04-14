@@ -1,0 +1,10 @@
+{
+  "name": "Asistente IA",
+  "handle": "asistente_ia",
+  "version": "1.0.0",
+  "description": "Asistente virtual inteligente para tu tienda",
+  "locations": ["store"],
+  "events": ["onFirstInteraction"],
+  "auto_install": false,
+  "development_mode": false
+} 
