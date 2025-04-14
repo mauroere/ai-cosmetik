@@ -64,9 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(loadingMessage);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Obtener la URL base del servidor
+            // Obtener la URL base del servidor y el store_id
             const baseUrl = window.location.origin;
             const apiUrl = `${baseUrl}/api/assistant`;
+            const storeId = new URLSearchParams(window.location.search).get('store_id');
+
+            if (!storeId) {
+                throw new Error('ID de tienda no proporcionado');
+            }
 
             console.log('Enviando solicitud a:', apiUrl);
 
@@ -79,7 +84,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message }),
+                body: JSON.stringify({ 
+                    message,
+                    store_id: storeId
+                }),
                 signal: controller.signal
             });
 
