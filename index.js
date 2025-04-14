@@ -252,7 +252,7 @@ app.post('/api/assistant', async (req, res) => {
                     role: "user",
                     content: message
                 }],
-                model: "anthropic/claude-3.7-sonnet", // Modelo correcto de Redpill.ai
+                model: "anthropic/claude-3.7-sonnet",
                 temperature: 0.7,
                 max_tokens: 150
             }, {
@@ -275,15 +275,26 @@ app.post('/api/assistant', async (req, res) => {
                 });
             }
 
+            // Analizar si la respuesta requiere productos
+            const responseContent = apiResponse.data.choices[0].message.content.toLowerCase();
+            const shouldIncludeProducts = responseContent.includes('producto') || 
+                                       responseContent.includes('productos') || 
+                                       responseContent.includes('precio') || 
+                                       responseContent.includes('catalogo') ||
+                                       responseContent.includes('catálogo') ||
+                                       responseContent.includes('disponible') ||
+                                       responseContent.includes('stock');
+
             // Procesar la respuesta y generar una respuesta adecuada
             const response = {
                 message: apiResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
-                products: getProducts() // Usar función con caché
+                products: shouldIncludeProducts ? getProducts() : [] // Solo incluir productos si es necesario
             };
 
             logger.info('Respuesta del asistente generada', { 
                 userMessage: message,
-                assistantResponse: response.message
+                assistantResponse: response.message,
+                includesProducts: shouldIncludeProducts
             });
 
             res.json(response);
@@ -306,7 +317,7 @@ app.post('/api/assistant', async (req, res) => {
             // Si hay un error con la API, devolver una respuesta genérica
             const response = {
                 message: "Lo siento, estoy teniendo problemas para conectarme con el servicio de IA. Por favor, intenta nuevamente en unos momentos.",
-                products: getProducts() // Usar función con caché
+                products: [] // No incluir productos en caso de error
             };
             
             res.json(response);
@@ -322,7 +333,8 @@ app.post('/api/assistant', async (req, res) => {
         // Enviar una respuesta más específica al cliente
         res.status(500).json({ 
             error: 'Error al procesar la solicitud',
-            message: 'Lo siento, ocurrió un error inesperado. Por favor, intenta nuevamente.'
+            message: 'Lo siento, ocurrió un error inesperado. Por favor, intenta nuevamente.',
+            products: [] // No incluir productos en caso de error
         });
     }
 });
