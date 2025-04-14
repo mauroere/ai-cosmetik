@@ -8,7 +8,8 @@ const logger = require('../utils/logger');
 class TiendanubeService {
     constructor() {
         this.baseURL = 'https://api.tiendanube.com/v1';
-        this.userAgent = 'Asesor ARBELL (maurorer@gmail.com)';
+        this.userAgent = 'Asistente IA (maurorer@gmail.com)';
+        this.apiBaseUrl = 'https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev';
     }
 
     async getClient(storeId, accessToken) {
@@ -117,7 +118,7 @@ class TiendanubeService {
                 name: product.name.es || product.name,
                 description: product.description.es || product.description || '',
                 price: product.price,
-                image: product.images && product.images.length > 0 ? product.images[0].src : '/images/placeholder.jpg',
+                image: product.images && product.images.length > 0 ? product.images[0].src : `${this.apiBaseUrl}/images/placeholder.jpg`,
                 category: product.categories && product.categories.length > 0 ? product.categories[0].name : 'Sin categoría',
                 stock: product.stock || 0,
                 url: product.permalink || `https://${storeId}.tiendanube.com/productos/${product.handle}`

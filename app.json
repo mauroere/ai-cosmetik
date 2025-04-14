@@ -1,12 +1,12 @@
 {
-  "name": "Asesor ARBELL",
+  "name": "Asistente IA",
   "description": "Asistente virtual inteligente para tu tienda Tiendanube que te ayuda a gestionar tu inventario y atender a tus clientes",
   "version": "1.0.0",
   "author": "Arbell Online",
-  "website": "https://www.arbellonline.com.ar",
+  "website": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev",
   "contact_email": "maurorer@gmail.com",
   "support_email": "maurorer@gmail.com",
-  "support_url": "https://www.arbellonline.com.ar/soporte",
+  "support_url": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/soporte",
   "categories": ["inventory", "customer-service", "marketing"],
   "platform": "tiendanube",
   "main_locale": "es",
@@ -18,7 +18,7 @@
   },
   "hooks": {
     "app": {
-      "url": "https://api.arbellonline.com.ar/api/assistant",
+      "url": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/api/assistant",
       "events": ["app.installed", "app.uninstalled"]
     }
   },
@@ -27,7 +27,7 @@
       "type": "text",
       "label": "API Key",
       "required": true,
-      "description": "Tu API Key de Arbell AI Assistant"
+      "description": "Tu API Key de Asistente IA"
     },
     "theme": {
       "type": "select",

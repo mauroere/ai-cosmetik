@@ -1,4 +1,4 @@
-# Guía de Instalación - Asesor ARBELL
+# Guía de Instalación - Asistente IA
 
 ## Requisitos Previos
 - Tener una tienda activa en Tiendanube
@@ -9,7 +9,7 @@
 1. **Acceder al Marketplace**
    - Inicia sesión en tu panel de administración de Tiendanube
    - Ve a la sección "Apps"
-   - Busca "Asesor ARBELL"
+   - Busca "Asistente IA"
    - Haz clic en "Instalar"
 
 2. **Autorizar la Aplicación**
@@ -21,7 +21,7 @@
 
 3. **Configuración Inicial**
    - Una vez instalada, serás redirigido a la página de configuración
-   - Ingresa tu API Key de Arbell AI Assistant
+   - Ingresa tu API Key de Asistente IA
    - Selecciona el tema del chat (Claro u Oscuro)
    - Elige la posición del chat en tu tienda
    - Guarda los cambios
@@ -70,6 +70,6 @@ La aplicación necesita los siguientes permisos:
 ## Soporte
 
 Si necesitas ayuda:
-- Email: soporte@arbellonline.com.ar
+- Email: maurorer@gmail.com
 - WhatsApp: +54 9 11 1234-5678
-- Documentación: https://docs.arbellonline.com.ar 
+- Documentación: https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/docs 

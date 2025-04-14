@@ -203,7 +203,7 @@
             input.value = '';
             
             try {
-                const response = await fetch('https://api.arbellonline.com.ar/api/assistant', {
+                const response = await fetch('https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/api/assistant', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -248,7 +248,7 @@
                 const productCard = document.createElement('div');
                 productCard.className = 'arbell-ai-product-card';
                 productCard.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://api.arbellonline.com.ar/images/placeholder.jpg'">
+                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/images/placeholder.jpg'">
                     <h3>${product.name}</h3>
                     <p class="price">$${product.price.toFixed(2)}</p>
                     <a href="${product.url}" target="_blank">Ver producto</a>
@@ -269,7 +269,7 @@
         });
         
         // Mensaje de bienvenida
-        addMessage('¡Hola! Soy el asistente virtual de Arbell Online. ¿En qué puedo ayudarte hoy?');
+        addMessage('¡Hola! Soy el Asistente IA. ¿En qué puedo ayudarte hoy?');
     }
 
     // Inicializar el widget
@@ -277,7 +277,7 @@
         if (config.apiKey && config.storeId) {
             createWidget(config);
         } else {
-            console.error('Arbell AI Assistant: API Key o Store ID no configurados');
+            console.error('Asistente IA: API Key o Store ID no configurados');
         }
     });
 })(); 
