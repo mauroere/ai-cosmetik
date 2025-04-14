@@ -9,6 +9,9 @@ const rateLimit = require('express-rate-limit');
 const winston = require('winston');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
+const storeContext = require('./data/assistant-context');
+const tiendanubeService = require('./services/tiendanubeService');
+const logger = require('./utils/logger');
 
 const app = express();
 
@@ -224,17 +227,137 @@ app.get('/api/docs', (req, res) => {
   });
 });
 
+// Rutas para la autenticación de Tiendanube
+app.get('/api/tiendanube/auth', (req, res) => {
+    // URL para iniciar el proceso de autenticación de Tiendanube
+    const authUrl = `https://www.tiendanube.com/apps/authorize?client_id=${tiendanubeConfig.clientId}&redirect_uri=${encodeURIComponent(tiendanubeConfig.redirectUri)}`;
+    res.json({ authUrl });
+});
+
+app.get('/api/tiendanube/callback', async (req, res) => {
+    try {
+        const { code } = req.query;
+        
+        if (!code) {
+            return res.status(400).json({ 
+                error: 'Código de autorización no proporcionado',
+                message: 'No se recibió el código de autorización de Tiendanube.'
+            });
+        }
+        
+        // Procesar el código de autorización
+        const authResult = await tiendanubeService.processAuthCode(code);
+        
+        // Redirigir a una página de éxito
+        res.redirect(`/auth-success.html?store_id=${authResult.storeId}`);
+    } catch (error) {
+        logger.error('Error en el callback de Tiendanube', {
+            message: error.message,
+            query: req.query
+        });
+        
+        // Redirigir a una página de error
+        res.redirect('/auth-error.html');
+    }
+});
+
+// Ruta para obtener productos de Tiendanube
+app.get('/api/products', async (req, res) => {
+    try {
+        const { store_id } = req.query;
+        
+        if (!store_id) {
+            return res.status(400).json({ 
+                error: 'ID de tienda no proporcionado',
+                message: 'Debes proporcionar el ID de la tienda.'
+            });
+        }
+        
+        const products = await tiendanubeService.getProducts(store_id);
+        res.json({ products });
+    } catch (error) {
+        logger.error('Error al obtener productos de Tiendanube', {
+            message: error.message,
+            store_id: req.query.store_id
+        });
+        
+        if (error.message.includes('Se requiere autenticación')) {
+            return res.status(401).json({ 
+                error: 'Autenticación requerida',
+                message: 'Esta tienda no está autenticada. Por favor, instala la aplicación primero.',
+                authUrl: `/api/tiendanube/auth?store_id=${req.query.store_id}`
+            });
+        }
+        
+        res.status(500).json({ 
+            error: 'Error al obtener productos',
+            message: 'No se pudieron obtener los productos de la tienda. Por favor, intenta nuevamente más tarde.'
+        });
+    }
+});
+
+// Ruta para buscar productos
+app.get('/api/products/search', async (req, res) => {
+    try {
+        const { query, store_id } = req.query;
+        
+        if (!query || typeof query !== 'string') {
+            return res.status(400).json({ 
+                error: 'Parámetro de búsqueda inválido',
+                message: 'Debes proporcionar un término de búsqueda válido.'
+            });
+        }
+        
+        if (!store_id) {
+            return res.status(400).json({ 
+                error: 'ID de tienda no proporcionado',
+                message: 'Debes proporcionar el ID de la tienda.'
+            });
+        }
+        
+        const products = await tiendanubeService.searchProducts(store_id, query);
+        res.json({ products });
+    } catch (error) {
+        logger.error('Error al buscar productos', {
+            message: error.message,
+            query: req.query.query,
+            store_id: req.query.store_id
+        });
+        
+        if (error.message.includes('Se requiere autenticación')) {
+            return res.status(401).json({ 
+                error: 'Autenticación requerida',
+                message: 'Esta tienda no está autenticada. Por favor, instala la aplicación primero.',
+                authUrl: `/api/tiendanube/auth?store_id=${req.query.store_id}`
+            });
+        }
+        
+        res.status(500).json({ 
+            error: 'Error al buscar productos',
+            message: 'No se pudieron buscar los productos. Por favor, intenta nuevamente más tarde.'
+        });
+    }
+});
+
 // Ruta para procesar mensajes del asistente
 app.post('/api/assistant', async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, store_id } = req.body;
         
         if (!message || typeof message !== 'string') {
             logger.error('Mensaje inválido recibido', { message });
             return res.status(400).json({ error: 'Mensaje inválido' });
         }
         
-        logger.info('Procesando mensaje del asistente', { message });
+        if (!store_id) {
+            logger.error('ID de tienda no proporcionado', { store_id });
+            return res.status(400).json({ 
+                error: 'ID de tienda no proporcionado',
+                message: 'Debes proporcionar el ID de la tienda.'
+            });
+        }
+        
+        logger.info('Procesando mensaje del asistente', { message, store_id });
         
         // Verificar que tenemos la API key
         if (!redpillConfig.apiKey) {
@@ -245,13 +368,47 @@ app.post('/api/assistant', async (req, res) => {
             });
         }
 
+        // Obtener productos de Tiendanube
+        let products = [];
+        try {
+            products = await tiendanubeService.getProducts(store_id);
+        } catch (error) {
+            logger.error('Error al obtener productos de Tiendanube para el asistente', {
+                message: error.message,
+                store_id
+            });
+            
+            if (error.message.includes('Se requiere autenticación')) {
+                return res.status(401).json({ 
+                    error: 'Autenticación requerida',
+                    message: 'Esta tienda no está autenticada. Por favor, instala la aplicación primero.',
+                    authUrl: `/api/tiendanube/auth?store_id=${store_id}`
+                });
+            }
+            
+            // Continuar con productos vacíos
+        }
+
         // Procesar el mensaje con la API
         try {
             const apiResponse = await axiosInstance.post('/chat/completions', {
-                messages: [{
-                    role: "user",
-                    content: message
-                }],
+                messages: [
+                    {
+                        role: "system",
+                        content: `Eres un asistente virtual de ${storeContext.storeName} (${storeContext.storeUrl}). 
+                        Tu función es ayudar a los clientes con información sobre nuestros productos y servicios.
+                        Solo debes hablar sobre los productos que tenemos en nuestra tienda.
+                        Si te preguntan por productos que no tenemos, indícales amablemente que no los tenemos disponibles.
+                        Siempre menciona que somos ${storeContext.storeName} y que pueden visitarnos en ${storeContext.storeUrl}.
+                        
+                        Información de productos disponibles:
+                        ${products.map(p => `- ${p.name}: ${p.description} (Precio: $${p.price})`).join('\n')}`
+                    },
+                    {
+                        role: "user",
+                        content: message
+                    }
+                ],
                 model: "anthropic/claude-3.7-sonnet",
                 temperature: 0.7,
                 max_tokens: 150
@@ -288,7 +445,7 @@ app.post('/api/assistant', async (req, res) => {
             // Procesar la respuesta y generar una respuesta adecuada
             const response = {
                 message: apiResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
-                products: shouldIncludeProducts ? getProducts() : [] // Solo incluir productos si es necesario
+                products: shouldIncludeProducts ? products : [] // Usar productos de Tiendanube
             };
 
             logger.info('Respuesta del asistente generada', { 
@@ -336,17 +493,6 @@ app.post('/api/assistant', async (req, res) => {
             message: 'Lo siento, ocurrió un error inesperado. Por favor, intenta nuevamente.',
             products: [] // No incluir productos en caso de error
         });
-    }
-});
-
-// Ruta para obtener información de productos
-app.get('/api/products', (req, res) => {
-    try {
-        const products = getProducts();
-        res.json({ products });
-    } catch (error) {
-        logger.error('Error al obtener productos', { error: error.message });
-        res.status(500).json({ error: 'Error al obtener productos' });
     }
 });
 

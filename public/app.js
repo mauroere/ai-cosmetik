@@ -34,11 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             imgElement.src = product.image;
             
+            // Crear el enlace al producto en Tiendanube
+            const productUrl = product.url || `https://www.arbellonline.com.ar/productos/${product.id}`;
+            
             productCard.innerHTML = `
                 <h3>${product.name}</h3>
-                <p class="price">$${product.price}</p>
+                <p class="price">$${product.price.toFixed(2)}</p>
                 <p class="description">${product.description}</p>
-                <a href="#" target="_blank">Ver producto</a>
+                <a href="${productUrl}" target="_blank" class="product-link">Ver producto en Arbell Online</a>
             `;
             
             // Insertar la imagen al principio del productCard
