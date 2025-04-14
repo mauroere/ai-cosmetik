@@ -1,10 +1,10 @@
 # Asistente Virtual para Tiendanube
 
-Este proyecto implementa un asistente virtual inteligente para tiendas Tiendanube utilizando Redpill.ai para el procesamiento de lenguaje natural y recomendaciones de productos.
+Este proyecto implementa un asistente virtual inteligente para tiendas Tiendanube utilizando OpenAI para el procesamiento de lenguaje natural y recomendaciones de productos.
 
 ## Características
 
-- Integración con Redpill.ai para procesamiento de lenguaje natural
+- Integración con OpenAI para procesamiento de lenguaje natural
 - Interfaz de chat interactiva
 - Recomendaciones de productos
 - Soporte al cliente
@@ -19,7 +19,7 @@ Este proyecto implementa un asistente virtual inteligente para tiendas Tiendanub
 ## Requisitos
 
 - Node.js (v14 o superior)
-- Cuenta en Redpill.ai con API key
+- Cuenta en OpenAI con API key
 
 ## Instalación
 
@@ -37,7 +37,7 @@ npm install
 3. Configurar variables de entorno:
    - Copiar `.env.example` a `.env`
    - Completar las variables con tus credenciales:
-     - REDPILL_API_KEY
+     - REDPILL_API_KEY (tu API key de OpenAI)
      - NODE_ENV (opcional, por defecto es 'development')
 
 4. Iniciar el servidor:
@@ -65,49 +65,23 @@ ai-cosmetik/
 └── README.md              # Documentación
 ```
 
-## API Endpoints
+## Solución de Problemas
 
-### Documentación de API
-- `GET /api/docs` - Obtiene documentación de la API
+### Error de conexión con OpenAI
 
-### Asistente Virtual
-- `POST /api/assistant` - Procesa un mensaje del usuario y devuelve una respuesta del asistente
-  - Request: `{ "message": "texto del mensaje" }`
-  - Response: `{ "message": "respuesta del asistente", "products": [...] }`
+Si experimentas errores de conexión con OpenAI, verifica:
 
-### Productos
-- `GET /api/products` - Obtiene la lista de productos disponibles
-- `POST /api/products/update` - Actualiza la lista de productos
-  - Request: `{ "products": [...] }`
+1. Que tu API key sea válida y esté correctamente configurada en el archivo `.env`
+2. Que tengas acceso a internet y que no haya restricciones de firewall
+3. Que la URL de la API sea correcta (https://api.openai.com)
 
-## Integración en Tiendanube
+### Error 500 en el servidor
 
-1. En el panel de administración de Tiendanube, ve a "Configuración" > "Código personalizado"
-2. Agrega el siguiente código en el footer de tu tienda:
+Si el servidor devuelve un error 500:
 
-```html
-<script>
-    // Cargar el asistente virtual
-    const script = document.createElement('script');
-    script.src = 'URL_DE_TU_SERVIDOR/public/app.js';
-    document.body.appendChild(script);
-</script>
-```
-
-## Personalización
-
-Puedes personalizar la apariencia del asistente modificando los archivos:
-- `public/styles.css` para el diseño
-- `public/index.html` para la estructura
-- `public/app.js` para la funcionalidad
-
-## Monitoreo y Mantenimiento
-
-El sistema incluye:
-- Logs detallados en la carpeta `logs/`
-- Rate limiting para proteger contra abusos
-- Validación de datos para garantizar la integridad
-- Sistema de caché para mejorar el rendimiento
+1. Revisa los logs en la carpeta `logs/` para obtener más información
+2. Verifica que todas las dependencias estén instaladas correctamente
+3. Asegúrate de que el archivo `products.json` exista y tenga un formato válido
 
 ## Soporte
 

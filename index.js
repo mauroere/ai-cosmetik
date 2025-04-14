@@ -242,43 +242,60 @@ app.post('/api/assistant', async (req, res) => {
         }
 
         // Procesar el mensaje con la API
-        const apiResponse = await axiosInstance.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
-            messages: [{
-                role: "user",
-                content: message
-            }],
-            model: "gpt-3.5-turbo",
-            temperature: 0.7,
-            max_tokens: 150
-        }, {
-            headers: {
-                'Authorization': `Bearer ${redpillConfig.apiKey}`
+        try {
+            const apiResponse = await axiosInstance.post(`${redpillConfig.baseURL}/v1/chat/completions`, {
+                messages: [{
+                    role: "user",
+                    content: message
+                }],
+                model: "gpt-3.5-turbo",
+                temperature: 0.7,
+                max_tokens: 150
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${redpillConfig.apiKey}`
+                }
+            });
+
+            logger.info('Respuesta recibida de la API', { 
+                status: apiResponse.status,
+                data: apiResponse.data
+            });
+
+            // Verificar que la respuesta tiene la estructura esperada
+            if (!apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices[0] || !apiResponse.data.choices[0].message) {
+                logger.error('Respuesta inválida de la API', { response: apiResponse.data });
+                return res.status(500).json({ error: 'Respuesta inválida del servicio de IA' });
             }
-        });
 
-        logger.info('Respuesta recibida de la API', { 
-            status: apiResponse.status,
-            data: apiResponse.data
-        });
+            // Procesar la respuesta y generar una respuesta adecuada
+            const response = {
+                message: apiResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
+                products: getProducts() // Usar función con caché
+            };
 
-        // Verificar que la respuesta tiene la estructura esperada
-        if (!apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices[0] || !apiResponse.data.choices[0].message) {
-            logger.error('Respuesta inválida de la API', { response: apiResponse.data });
-            return res.status(500).json({ error: 'Respuesta inválida del servicio de IA' });
+            logger.info('Respuesta del asistente generada', { 
+                userMessage: message,
+                assistantResponse: response.message
+            });
+
+            res.json(response);
+        } catch (apiError) {
+            logger.error('Error al comunicarse con la API de OpenAI', {
+                message: apiError.message,
+                response: apiError.response?.data,
+                status: apiError.response?.status,
+                stack: apiError.stack
+            });
+            
+            // Si hay un error con la API, devolver una respuesta genérica
+            const response = {
+                message: "Lo siento, estoy teniendo problemas para conectarme con el servicio de IA. Por favor, intenta nuevamente en unos momentos.",
+                products: getProducts() // Usar función con caché
+            };
+            
+            res.json(response);
         }
-
-        // Procesar la respuesta y generar una respuesta adecuada
-        const response = {
-            message: apiResponse.data.choices[0].message.content || "Lo siento, no pude procesar tu mensaje correctamente.",
-            products: getProducts() // Usar función con caché
-        };
-
-        logger.info('Respuesta del asistente generada', { 
-            userMessage: message,
-            assistantResponse: response.message
-        });
-
-        res.json(response);
     } catch (error) {
         logger.error('Error al procesar mensaje del asistente', {
             message: error.message,

@@ -48,7 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessages.appendChild(loadingMessage);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            const response = await fetch('/api/assistant', {
+            // Obtener la URL base del servidor
+            const baseUrl = window.location.origin;
+            const apiUrl = `${baseUrl}/api/assistant`;
+
+            console.log('Enviando solicitud a:', apiUrl);
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
