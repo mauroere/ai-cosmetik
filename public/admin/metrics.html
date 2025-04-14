@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métricas - Asistente IA</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .chart-container {
+            margin-top: 30px;
+            height: 300px;
+            position: relative;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Métricas del Asistente IA</h1>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="totalConversations">-</div>
+                <div class="metric-label">Conversaciones Totales</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avgResponseTime">-</div>
+                <div class="metric-label">Tiempo Promedio de Respuesta</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="satisfactionRate">-</div>
+                <div class="metric-label">Tasa de Satisfacción</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="activeUsers">-</div>
+                <div class="metric-label">Usuarios Activos</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="conversationsChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMetrics();
+        });
+
+        async function loadMetrics() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const storeId = urlParams.get('store_id');
+                
+                const response = await fetch(`/api/metrics?store_id=${storeId}`);
+                const metrics = await response.json();
+
+                // Actualizar métricas
+                document.getElementById('totalConversations').textContent = 
+                    metrics.totalConversations || '0';
+                document.getElementById('avgResponseTime').textContent = 
+                    `${(metrics.avgResponseTime || 0).toFixed(1)}s`;
+                document.getElementById('satisfactionRate').textContent = 
+                    `${(metrics.satisfactionRate || 0).toFixed(1)}%`;
+                document.getElementById('activeUsers').textContent = 
+                    metrics.activeUsers || '0';
+
+                // Aquí podrías agregar la lógica para mostrar gráficos
+                // usando una librería de gráficos que cumpla con la CSP
+
+            } catch (error) {
+                console.error('Error al cargar métricas:', error);
+                // Mostrar mensaje de error
+            }
+        }
+    </script>
+</body>
+</html> 

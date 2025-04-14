@@ -1,22 +1,36 @@
 const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
+const path = require('path');
+
+// Servir páginas de administración
+router.get('/config', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'config.html'));
+});
+
+router.get('/metrics', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'metrics.html'));
+});
+
+router.get('/conversations', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'conversations.html'));
+});
 
 // Configuración de links de administrador
 const adminLinks = [
     {
         location: "Listado de páginas",
-        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/config",
+        url: "/admin/config",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     },
     {
         location: "Listado de productos",
-        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/metrics",
+        url: "/admin/metrics",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     },
     {
         location: "Listado de órdenes",
-        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/conversations",
+        url: "/admin/conversations",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     }
 ];
@@ -29,10 +43,11 @@ router.get('/links', async (req, res) => {
             return res.status(400).json({ error: 'Se requiere store_id' });
         }
 
-        // Agregar store_id a las URLs
+        // Construir URLs completas con el dominio base
+        const baseUrl = 'https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev';
         const links = adminLinks.map(link => ({
             ...link,
-            url: `${link.url}?store_id=${storeId}`
+            url: `${baseUrl}${link.url}?store_id=${storeId}`
         }));
 
         res.json({ links });
