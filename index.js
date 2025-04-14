@@ -110,12 +110,12 @@ axiosInstance.interceptors.response.use(
 // Esquema de validación para productos
 const productSchema = Joi.object({
   id: Joi.number().required(),
-  name: Joi.string().required().min(3).max(100),
-  description: Joi.string().required().min(10).max(500),
-  price: Joi.number().required().min(0),
-  image: Joi.string().uri().required(),
+  name: Joi.string().required(),
+  description: Joi.string().required(),
+  price: Joi.number().required(),
+  image: Joi.string().required(),
   category: Joi.string().required(),
-  stock: Joi.number().integer().min(0).required()
+  stock: Joi.number().required()
 });
 
 // Sistema de caché para productos
@@ -243,7 +243,10 @@ app.post('/api/assistant', async (req, res) => {
         // Verificar que tenemos la API key
         if (!redpillConfig.apiKey) {
             logger.error('API key no configurada');
-            return res.status(500).json({ error: 'Error de configuración del servidor' });
+            return res.status(500).json({ 
+                error: 'Error de configuración del servidor',
+                message: 'Por favor, contacta al administrador del sistema.'
+            });
         }
 
         // Procesar el mensaje con la API
@@ -270,7 +273,10 @@ app.post('/api/assistant', async (req, res) => {
             // Verificar que la respuesta tiene la estructura esperada
             if (!apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices[0] || !apiResponse.data.choices[0].message) {
                 logger.error('Respuesta inválida de la API', { response: apiResponse.data });
-                return res.status(500).json({ error: 'Respuesta inválida del servicio de IA' });
+                return res.status(500).json({ 
+                    error: 'Error en el servicio de IA',
+                    message: 'Lo siento, hubo un problema al procesar tu mensaje. Por favor, intenta nuevamente.'
+                });
             }
 
             // Procesar la respuesta y generar una respuesta adecuada
@@ -293,6 +299,14 @@ app.post('/api/assistant', async (req, res) => {
                 stack: apiError.stack
             });
             
+            // Manejar específicamente el error de API key inválida
+            if (apiError.response?.status === 401) {
+                return res.status(500).json({ 
+                    error: 'Error de autenticación',
+                    message: 'Lo siento, hay un problema con la configuración del sistema. Por favor, contacta al administrador.'
+                });
+            }
+            
             // Si hay un error con la API, devolver una respuesta genérica
             const response = {
                 message: "Lo siento, estoy teniendo problemas para conectarme con el servicio de IA. Por favor, intenta nuevamente en unos momentos.",
@@ -312,7 +326,7 @@ app.post('/api/assistant', async (req, res) => {
         // Enviar una respuesta más específica al cliente
         res.status(500).json({ 
             error: 'Error al procesar la solicitud',
-            details: error.response?.data || error.message
+            message: 'Lo siento, ocurrió un error inesperado. Por favor, intenta nuevamente.'
         });
     }
 });
