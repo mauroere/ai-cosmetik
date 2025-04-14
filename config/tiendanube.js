@@ -20,7 +20,17 @@ const tiendanubeConfig = {
     },
     
     // Almacenamiento de tokens por tienda
-    storeTokens: {}
+    storeTokens: {},
+
+    // Configuración de la aplicación
+    app: {
+        name: "Asistente IA",
+        version: "1.0.0",
+        scopes: ["products", "orders", "customers"],
+        mainLocale: "es",
+        locales: ["es", "pt"],
+        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
+    }
 };
 
 module.exports = tiendanubeConfig; 
