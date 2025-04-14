@@ -42,7 +42,10 @@ app.set('trust proxy', 1);
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100 // límite de 100 solicitudes por ventana
+  max: 100, // límite de 100 solicitudes por ventana
+  keyGenerator: (req) => {
+    return req.ip; // Usar IP directamente en lugar de X-Forwarded-For
+  }
 });
 app.use('/api/', limiter);
 
