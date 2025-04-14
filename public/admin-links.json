@@ -1,0 +1,25 @@
+{
+  "links": [
+    {
+      "name": "Configurar Asistente",
+      "description": "Configura los ajustes del asistente virtual",
+      "url": "/admin/config.html",
+      "icon": "settings",
+      "location": "products"
+    },
+    {
+      "name": "Ver Métricas",
+      "description": "Visualiza las estadísticas de uso del asistente",
+      "url": "/admin/metrics.html",
+      "icon": "analytics",
+      "location": "home"
+    },
+    {
+      "name": "Historial de Conversaciones",
+      "description": "Revisa las conversaciones del asistente con los clientes",
+      "url": "/admin/conversations.html",
+      "icon": "chat",
+      "location": "orders"
+    }
+  ]
+} 
