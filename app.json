@@ -1,0 +1,43 @@
+{
+  "name": "Arbell AI Assistant",
+  "description": "Asistente virtual inteligente para tu tienda Tiendanube",
+  "version": "1.0.0",
+  "author": "Arbell Online",
+  "website": "https://www.arbellonline.com.ar",
+  "repository": "https://github.com/arbellonline/ai-assistant",
+  "license": "MIT",
+  "categories": ["customer-service", "marketing", "sales"],
+  "platform": "tiendanube",
+  "hooks": {
+    "app": {
+      "url": "https://api.arbellonline.com.ar/api/assistant",
+      "events": ["app.installed", "app.uninstalled"]
+    }
+  },
+  "settings": {
+    "api_key": {
+      "type": "text",
+      "label": "API Key",
+      "required": true,
+      "description": "Tu API Key de Arbell AI Assistant"
+    },
+    "theme": {
+      "type": "select",
+      "label": "Tema del chat",
+      "options": [
+        {"value": "light", "label": "Claro"},
+        {"value": "dark", "label": "Oscuro"}
+      ],
+      "default": "light"
+    },
+    "position": {
+      "type": "select",
+      "label": "Posición del chat",
+      "options": [
+        {"value": "bottom-right", "label": "Abajo derecha"},
+        {"value": "bottom-left", "label": "Abajo izquierda"}
+      ],
+      "default": "bottom-right"
+    }
+  }
+} 
