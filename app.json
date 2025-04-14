@@ -1,13 +1,21 @@
 {
-  "name": "Arbell AI Assistant",
-  "description": "Asistente virtual inteligente para tu tienda Tiendanube",
+  "name": "Asesor ARBELL",
+  "description": "Asistente virtual inteligente para tu tienda Tiendanube que te ayuda a gestionar tu inventario y atender a tus clientes",
   "version": "1.0.0",
   "author": "Arbell Online",
   "website": "https://www.arbellonline.com.ar",
-  "repository": "https://github.com/arbellonline/ai-assistant",
-  "license": "MIT",
-  "categories": ["customer-service", "marketing", "sales"],
+  "contact_email": "maurorer@gmail.com",
+  "support_email": "maurorer@gmail.com",
+  "support_url": "https://www.arbellonline.com.ar/soporte",
+  "categories": ["inventory", "customer-service", "marketing"],
   "platform": "tiendanube",
+  "main_locale": "es",
+  "locales": ["es", "pt"],
+  "features": {
+    "products": ["read"],
+    "orders": ["read"],
+    "customers": ["read"]
+  },
   "hooks": {
     "app": {
       "url": "https://api.arbellonline.com.ar/api/assistant",

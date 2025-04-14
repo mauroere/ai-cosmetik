@@ -7,12 +7,17 @@ const logger = require('../utils/logger');
  */
 class TiendanubeService {
     constructor() {
-        this.axiosInstance = axios.create({
-            baseURL: tiendanubeConfig.baseURL,
-            timeout: 10000,
+        this.baseURL = 'https://api.tiendanube.com/v1';
+        this.userAgent = 'Asesor ARBELL (maurorer@gmail.com)';
+    }
+
+    async getClient(storeId, accessToken) {
+        return axios.create({
+            baseURL: this.baseURL,
             headers: {
-                'Content-Type': 'application/json',
-                'User-Agent': 'Arbell-Online-Assistant/1.0'
+                'Authentication': `bearer ${accessToken}`,
+                'User-Agent': this.userAgent,
+                'Content-Type': 'application/json'
             }
         });
     }
@@ -104,11 +109,7 @@ class TiendanubeService {
         try {
             const accessToken = await this.getAccessToken(storeId);
             
-            const response = await this.axiosInstance.get(`/${storeId}/products`, {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
+            const response = await this.getClient(storeId, accessToken).get(`/${storeId}/products`);
 
             // Transformar los productos al formato que espera nuestra aplicación
             const products = response.data.products.map(product => ({
@@ -173,6 +174,48 @@ class TiendanubeService {
             logger.error(`Error al buscar productos en la tienda ${storeId}`, {
                 query,
                 message: error.message
+            });
+            throw error;
+        }
+    }
+
+    async getOrders(storeId, accessToken) {
+        try {
+            const client = await this.getClient(storeId, accessToken);
+            const response = await client.get(`/${storeId}/orders`);
+            return response.data;
+        } catch (error) {
+            logger.error('Error al obtener órdenes', {
+                error: error.message,
+                store_id: storeId
+            });
+            throw error;
+        }
+    }
+
+    async getCustomers(storeId, accessToken) {
+        try {
+            const client = await this.getClient(storeId, accessToken);
+            const response = await client.get(`/${storeId}/customers`);
+            return response.data;
+        } catch (error) {
+            logger.error('Error al obtener clientes', {
+                error: error.message,
+                store_id: storeId
+            });
+            throw error;
+        }
+    }
+
+    async getStoreInfo(storeId, accessToken) {
+        try {
+            const client = await this.getClient(storeId, accessToken);
+            const response = await client.get(`/${storeId}/store`);
+            return response.data;
+        } catch (error) {
+            logger.error('Error al obtener información de la tienda', {
+                error: error.message,
+                store_id: storeId
             });
             throw error;
         }
