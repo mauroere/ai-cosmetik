@@ -2,6 +2,25 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
 
+// Configuración de links de administrador
+const adminLinks = [
+    {
+        location: "Listado de páginas",
+        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/config",
+        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
+    },
+    {
+        location: "Listado de productos",
+        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/metrics",
+        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
+    },
+    {
+        location: "Listado de órdenes",
+        url: "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/admin/conversations",
+        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
+    }
+];
+
 // Obtener links de administrador
 router.get('/links', async (req, res) => {
     try {
@@ -10,14 +29,10 @@ router.get('/links', async (req, res) => {
             return res.status(400).json({ error: 'Se requiere store_id' });
         }
 
-        // Cargar configuración de links
-        const adminLinks = require('../public/admin-links.json');
-        
-        // Construir URLs completas
-        const baseUrl = `https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev`;
-        const links = adminLinks.links.map(link => ({
+        // Agregar store_id a las URLs
+        const links = adminLinks.map(link => ({
             ...link,
-            url: `${baseUrl}${link.url}?store_id=${storeId}`
+            url: `${link.url}?store_id=${storeId}`
         }));
 
         res.json({ links });

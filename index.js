@@ -16,6 +16,7 @@ const { initializeDirectories } = require('./utils/init');
 const productsRouter = require('./routes/products');
 const storeRouter = require('./routes/store');
 const adminRouter = require('./routes/admin');
+const tiendanubeAuthRouter = require('./routes/tiendanube-auth');
 
 const app = express();
 
@@ -586,6 +587,7 @@ app.use((err, req, res, next) => {
 app.use('/api/products', productsRouter);
 app.use('/api/store', storeRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/tiendanube', tiendanubeAuthRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
