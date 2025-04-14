@@ -1,4 +1,12 @@
 const winston = require('winston');
+const fs = require('fs');
+const path = require('path');
+
+// Crear directorio de logs si no existe
+const logDir = path.join(__dirname, '..', 'logs');
+if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+}
 
 // Configuración del formato de logs
 const logFormat = winston.format.combine(
@@ -13,14 +21,14 @@ const logger = winston.createLogger({
     transports: [
         // Escribir logs de error en error.log
         new winston.transports.File({ 
-            filename: 'logs/error.log', 
+            filename: path.join(logDir, 'error.log'), 
             level: 'error',
             maxsize: 5242880, // 5MB
             maxFiles: 5
         }),
         // Escribir todos los logs en combined.log
         new winston.transports.File({ 
-            filename: 'logs/combined.log',
+            filename: path.join(logDir, 'combined.log'),
             maxsize: 5242880, // 5MB
             maxFiles: 5
         })
