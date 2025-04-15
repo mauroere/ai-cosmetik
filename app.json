@@ -14,13 +14,14 @@
   "platform": "tiendanube",
   "main_locale": "es",
   "locales": ["es", "pt"],
+  "admin_url": "https://ai-cosmetik-production.up.railway.app/admin",
   "features": {
     "products": ["read"],
     "orders": ["read"],
     "customers": ["read"]
   },
   "webhooks": {
-    "url": "https://ai-cosmetik-production.up.railway.app/api/assistant",
+    "url": "https://ai-cosmetik-production.up.railway.app/api/webhooks",
     "events": [
       "order/created",
       "order/paid",

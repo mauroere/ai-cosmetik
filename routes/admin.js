@@ -83,4 +83,65 @@ router.get('/links', authenticateToken, async (req, res) => {
     }
 });
 
+// Ruta para obtener la configuración
+router.get('/config', async (req, res) => {
+    try {
+        const { store_id } = req.query;
+        if (!store_id) {
+            return res.status(400).json({ error: 'Se requiere store_id' });
+        }
+
+        // Aquí deberías obtener la configuración de tu base de datos
+        // Por ahora retornamos valores por defecto
+        res.json({
+            welcomeMessage: '¡Hola! Soy el asistente virtual de Arbell. ¿En qué puedo ayudarte?',
+            primaryColor: '#6B4E71',
+            position: 'bottom-right'
+        });
+    } catch (error) {
+        logger.error('Error al obtener configuración', { error: error.message });
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// Ruta para guardar la configuración
+router.post('/config', async (req, res) => {
+    try {
+        const { store_id, welcomeMessage, primaryColor, position } = req.body;
+        
+        if (!store_id) {
+            return res.status(400).json({ error: 'Se requiere store_id' });
+        }
+
+        // Aquí deberías guardar la configuración en tu base de datos
+        logger.info('Configuración guardada', { store_id, config: req.body });
+        
+        res.json({ success: true, message: 'Configuración guardada exitosamente' });
+    } catch (error) {
+        logger.error('Error al guardar configuración', { error: error.message });
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// Ruta para obtener estadísticas
+router.get('/stats', async (req, res) => {
+    try {
+        const { store_id } = req.query;
+        
+        if (!store_id) {
+            return res.status(400).json({ error: 'Se requiere store_id' });
+        }
+
+        // Aquí deberías obtener las estadísticas reales de tu base de datos
+        res.json({
+            totalConversations: 0,
+            responseRate: 0,
+            satisfactionRate: 0
+        });
+    } catch (error) {
+        logger.error('Error al obtener estadísticas', { error: error.message });
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
 module.exports = router; 
