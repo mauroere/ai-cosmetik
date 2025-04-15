@@ -17,6 +17,7 @@ const productsRouter = require('./routes/products');
 const storeRouter = require('./routes/store');
 const adminRouter = require('./routes/admin');
 const tiendanubeAuthRouter = require('./routes/tiendanube-auth');
+const webhooksRouter = require('./routes/webhooks');
 
 const app = express();
 
@@ -588,6 +589,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/store', storeRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/tiendanube', tiendanubeAuthRouter);
+app.use('/api/webhooks', webhooksRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
