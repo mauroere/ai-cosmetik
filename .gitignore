@@ -44,4 +44,10 @@ Thumbs.db
 .idea/
 .vscode/
 *.sublime-project
-*.sublime-workspace 
+*.sublime-workspace
+
+# Archivos específicos del proyecto
+/public/images/products/*
+!/public/images/products/.gitkeep
+/data/backups/
+*.bak 

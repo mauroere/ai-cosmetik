@@ -2,11 +2,14 @@
   "name": "Asistente IA",
   "description": "Asistente virtual inteligente para tu tienda Tiendanube que te ayuda a gestionar tu inventario y atender a tus clientes",
   "version": "1.0.0",
-  "author": "Arbell Online",
-  "website": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev",
+  "author": {
+    "name": "Arbell Online",
+    "email": "maurorer@gmail.com"
+  },
+  "website": "https://ai-cosmetik-production.up.railway.app",
   "contact_email": "maurorer@gmail.com",
   "support_email": "maurorer@gmail.com",
-  "support_url": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/soporte",
+  "support_url": "https://ai-cosmetik-production.up.railway.app/soporte",
   "categories": ["inventory", "customer-service", "marketing"],
   "platform": "tiendanube",
   "main_locale": "es",
@@ -16,11 +19,15 @@
     "orders": ["read"],
     "customers": ["read"]
   },
-  "hooks": {
-    "app": {
-      "url": "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/api/assistant",
-      "events": ["app.installed", "app.uninstalled"]
-    }
+  "webhooks": {
+    "url": "https://ai-cosmetik-production.up.railway.app/api/assistant",
+    "events": [
+      "order/created",
+      "order/paid",
+      "order/fulfilled",
+      "product/created",
+      "product/updated"
+    ]
   },
   "settings": {
     "api_key": {

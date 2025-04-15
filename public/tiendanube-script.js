@@ -1,9 +1,9 @@
 // Arbell Chatbot Integration Script
 (function() {
-    // Configuration
+    // Configuración inicial
     const config = {
-        apiUrl: 'https://api.arbell.ai', // Replace with actual production URL
-        chatbotContainer: 'arbell-chatbot-container'
+        apiUrl: 'https://ai-cosmetik-production.up.railway.app',
+        chatbotContainer: 'asistente-ia-container'
     };
 
     // Create chatbot container

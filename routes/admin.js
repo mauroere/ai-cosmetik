@@ -44,7 +44,7 @@ router.get('/links', async (req, res) => {
         }
 
         // Construir URLs completas con el dominio base
-        const baseUrl = 'https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev';
+        const baseUrl = 'https://ai-cosmetik-production.up.railway.app';
         const links = adminLinks.map(link => ({
             ...link,
             url: `${baseUrl}${link.url}?store_id=${storeId}`

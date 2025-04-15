@@ -8,7 +8,7 @@ require('dotenv').config();
 const tiendanubeConfig = {
     clientId: process.env.TIENDANUBE_CLIENT_ID || "16635",
     clientSecret: process.env.TIENDANUBE_CLIENT_SECRET,
-    redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/auth-success.html"
+    redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://ai-cosmetik-production.up.railway.app/auth-success.html"
 };
 
 // Ruta para manejar el callback de autenticación

@@ -9,7 +9,10 @@ class TiendanubeService {
     constructor() {
         this.baseURL = 'https://api.tiendanube.com/v1';
         this.userAgent = 'Asistente IA (maurorer@gmail.com)';
-        this.apiBaseUrl = 'https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev';
+        this.apiBaseUrl = 'https://ai-cosmetik-production.up.railway.app';
+        this.clientSecret = null;
+        this.storeId = null;
+        this.accessToken = null;
     }
 
     async getClient(storeId, accessToken) {

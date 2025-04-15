@@ -203,7 +203,7 @@
             input.value = '';
             
             try {
-                const response = await fetch('https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/api/assistant', {
+                const response = await fetch('https://ai-cosmetik-production.up.railway.app/api/assistant', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -247,17 +247,23 @@
             products.forEach(product => {
                 const productCard = document.createElement('div');
                 productCard.className = 'arbell-ai-product-card';
-                productCard.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev/images/placeholder.jpg'">
-                    <h3>${product.name}</h3>
-                    <p class="price">$${product.price.toFixed(2)}</p>
-                    <a href="${product.url}" target="_blank">Ver producto</a>
-                `;
+                productCard.innerHTML = createProductCard(product);
                 productsDiv.appendChild(productCard);
             });
             
             messagesContainer.appendChild(productsDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function createProductCard(product) {
+            return `
+                <div class="product-card">
+                    <img src="${product.image}" alt="${product.name}" onerror="this.src='https://ai-cosmetik-production.up.railway.app/images/placeholder.jpg'">
+                    <h3>${product.name}</h3>
+                    <p class="price">$${product.price.toFixed(2)}</p>
+                    <a href="${product.url}" target="_blank">Ver producto</a>
+                </div>
+            `;
         }
         
         // Event listeners

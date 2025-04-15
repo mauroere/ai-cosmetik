@@ -1,7 +1,7 @@
 (function() {
-    // Configuración inicial
+    // Configuración del script de instalación
     const config = {
-        baseUrl: 'https://super-broccoli-x5wq9r55vhv6wv-3000.app.github.dev',
+        baseUrl: 'https://ai-cosmetik-production.up.railway.app',
         version: '1.0.0'
     };
 
