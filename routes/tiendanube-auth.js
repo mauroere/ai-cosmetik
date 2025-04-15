@@ -8,12 +8,13 @@ require('dotenv').config();
 const tiendanubeConfig = {
     clientId: process.env.TIENDANUBE_CLIENT_ID || "16635",
     clientSecret: process.env.TIENDANUBE_CLIENT_SECRET,
-    redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://ai-cosmetik-production.up.railway.app/auth-success.html"
+    redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://ai-cosmetik-production.up.railway.app/api/tiendanube/callback",
+    scopes: ["products/read", "orders/read", "customers/read"]
 };
 
 // Ruta para iniciar el proceso de autenticación
 router.get('/auth', (req, res) => {
-    const authUrl = `https://www.tiendanube.com/apps/authorize/token?client_id=${tiendanubeConfig.clientId}&response_type=code&redirect_uri=${encodeURIComponent(tiendanubeConfig.redirectUri)}`;
+    const authUrl = `https://www.tiendanube.com/apps/authorize?client_id=${tiendanubeConfig.clientId}&response_type=code&scope=${tiendanubeConfig.scopes.join(' ')}&redirect_uri=${encodeURIComponent(tiendanubeConfig.redirectUri)}`;
     res.redirect(authUrl);
 });
 
@@ -35,7 +36,8 @@ router.get('/callback', async (req, res) => {
             code: code
         }, {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'User-Agent': 'Asistente IA (maurorer@gmail.com)'
             }
         });
 
@@ -44,8 +46,8 @@ router.get('/callback', async (req, res) => {
         // Guardar el token y store_id en tu base de datos
         logger.info('Autenticación exitosa', { store_id });
 
-        // Redirigir a la página de éxito
-        res.redirect(`${tiendanubeConfig.redirectUri}?store_id=${store_id}`);
+        // Redirigir a la página de éxito con los parámetros necesarios
+        res.redirect(`/auth-success.html?store_id=${store_id}&access_token=${access_token}`);
 
     } catch (error) {
         logger.error('Error en autenticación de Tiendanube', {
@@ -53,10 +55,7 @@ router.get('/callback', async (req, res) => {
             response: error.response?.data
         });
 
-        res.status(500).json({
-            error: 'Error en autenticación',
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        res.redirect('/auth-error.html');
     }
 });
 

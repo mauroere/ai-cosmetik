@@ -5,7 +5,7 @@ const tiendanubeConfig = {
     // Credenciales de la API de Tiendanube
     clientId: process.env.TIENDANUBE_CLIENT_ID,
     clientSecret: process.env.TIENDANUBE_CLIENT_SECRET,
-    redirectUri: process.env.TIENDANUBE_REDIRECT_URI,
+    redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://ai-cosmetik-production.up.railway.app/api/tiendanube/callback",
     
     // URL base de la API
     baseURL: 'https://api.tiendanube.com/v1',
@@ -26,10 +26,13 @@ const tiendanubeConfig = {
     app: {
         name: "Asistente IA",
         version: "1.0.0",
-        scopes: ["products", "orders", "customers"],
+        scopes: ["products/read", "orders/read", "customers/read"],
         mainLocale: "es",
         locales: ["es", "pt"],
-        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
+        regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"],
+        type: "external", // Tipo de aplicación: external o integrated
+        locations: ["store"], // Ubicaciones donde se mostrará la app
+        events: ["onFirstInteraction"] // Eventos que disparan la app
     }
 };
 
