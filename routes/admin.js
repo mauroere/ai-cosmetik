@@ -78,7 +78,7 @@ router.get('/links', authenticateToken, async (req, res) => {
         const baseUrl = 'https://ai-cosmetik-production.up.railway.app';
         const links = adminLinks.map(link => ({
             ...link,
-            url: `${baseUrl}${link.url}?store_id=${storeId}`
+            url: `${baseUrl}${link.url}/${storeId}`
         }));
 
         res.json({ links });
@@ -89,9 +89,9 @@ router.get('/links', authenticateToken, async (req, res) => {
 });
 
 // Ruta para obtener la configuración
-router.get('/api/config', async (req, res) => {
+router.get('/api/config/:store_id', async (req, res) => {
     try {
-        const { store_id } = req.query;
+        const { store_id } = req.params;
         if (!store_id) {
             return res.status(400).json({ error: 'Se requiere store_id' });
         }
@@ -110,9 +110,10 @@ router.get('/api/config', async (req, res) => {
 });
 
 // Ruta para guardar la configuración
-router.post('/api/config', async (req, res) => {
+router.post('/api/config/:store_id', async (req, res) => {
     try {
-        const { store_id, welcomeMessage, primaryColor, position } = req.body;
+        const { store_id } = req.params;
+        const { welcomeMessage, primaryColor, position } = req.body;
         
         if (!store_id) {
             return res.status(400).json({ error: 'Se requiere store_id' });
@@ -129,9 +130,9 @@ router.post('/api/config', async (req, res) => {
 });
 
 // Ruta para obtener estadísticas
-router.get('/api/stats', async (req, res) => {
+router.get('/api/stats/:store_id', async (req, res) => {
     try {
-        const { store_id } = req.query;
+        const { store_id } = req.params;
         
         if (!store_id) {
             return res.status(400).json({ error: 'Se requiere store_id' });
