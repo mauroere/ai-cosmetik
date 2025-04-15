@@ -48,11 +48,25 @@
         };
     }
 
-    // Initialize chatbot
-    function initChatbot() {
+    // Función para obtener el store_id de la URL
+    function getStoreIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('store_id');
+    }
+
+    // Función para inicializar el chatbot
+    function initChatbot(container) {
+        // Obtener store_id de la URL o del contexto de Tiendanube
+        const storeId = getStoreIdFromUrl() || window.Tiendanube?.store?.id;
+        
+        if (!storeId) {
+            console.error('Error: ID de tienda no proporcionado');
+            return;
+        }
+
         // Get store information from Tiendanube
         const storeInfo = {
-            id: window.LS && window.LS.store && window.LS.store.id,
+            id: storeId,
             name: window.LS && window.LS.store && window.LS.store.name,
             language: document.documentElement.lang || 'es'
         };
@@ -83,8 +97,22 @@
 
     // Load script when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initChatbot);
+        document.addEventListener('DOMContentLoaded', () => initChatbot());
     } else {
         initChatbot();
+    }
+
+    // Función para enviar mensaje
+    function sendMessage(message) {
+        if (!message.trim()) return;
+        
+        // Obtener store_id actualizado
+        const currentStoreId = getStoreIdFromUrl() || window.Tiendanube?.store?.id;
+        if (!currentStoreId) {
+            console.error('Error: ID de tienda no proporcionado');
+            return;
+        }
+
+        // ... existing code ...
     }
 })(); 

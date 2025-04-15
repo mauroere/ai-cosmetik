@@ -54,8 +54,23 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Función para enviar mensaje al servidor
+    // Función para obtener el store_id de la URL
+    function getStoreIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('store_id');
+    }
+
+    // Función para enviar mensaje
     async function sendMessage(message, retryCount = 0) {
+        if (!message.trim()) return;
+        
+        // Obtener store_id de la URL o del contexto de Tiendanube
+        const storeId = getStoreIdFromUrl() || window.Tiendanube?.store?.id;
+        if (!storeId) {
+            console.error('Error: ID de tienda no proporcionado');
+            return;
+        }
+
         try {
             // Mostrar indicador de carga
             const loadingMessage = document.createElement('div');
@@ -67,11 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Obtener la URL base del servidor y el store_id
             const baseUrl = window.location.origin;
             const apiUrl = `${baseUrl}/api/assistant`;
-            const storeId = new URLSearchParams(window.location.search).get('store_id');
-
-            if (!storeId) {
-                throw new Error('ID de tienda no proporcionado');
-            }
 
             console.log('Enviando solicitud a:', apiUrl);
 
@@ -149,7 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener para la tecla Enter
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            sendBtn.click();
+            const message = userInput.value;
+            sendMessage(message);
         }
     });
 
