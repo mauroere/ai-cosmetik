@@ -3,7 +3,8 @@
     // Configuración inicial
     const config = {
         apiUrl: 'https://ai-cosmetik-production.up.railway.app',
-        chatbotContainer: 'asistente-ia-container'
+        chatbotContainer: 'asistente-ia-container',
+        version: 'v1.1'
     };
 
     // Create chatbot container with full interface
@@ -16,29 +17,31 @@
             right: 20px;
             width: 350px;
             height: 500px;
-            z-index: 1000;
+            z-index: 9999;
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             display: none;
             flex-direction: column;
             overflow: hidden;
+            font-family: Arial, sans-serif;
         `;
 
         // Chat header
         const header = document.createElement('div');
         header.style.cssText = `
             padding: 15px;
-            background: #007bff;
+            background: #6B4E71;
             color: white;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 10px 10px 0 0;
         `;
         header.innerHTML = `
-            <span>Asistente IA Arbell</span>
-            <button style="background: none; border: none; color: white; cursor: pointer;">_</button>
+            <span>Asistente Virtual Arbell</span>
+            <button style="background: none; border: none; color: white; cursor: pointer; font-size: 18px;">_</button>
         `;
 
         // Chat messages container
@@ -47,6 +50,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 15px;
+            background: #f8f9fa;
         `;
 
         // Chat input area
@@ -55,22 +59,26 @@
             padding: 15px;
             border-top: 1px solid #eee;
             display: flex;
+            background: white;
         `;
         inputArea.innerHTML = `
             <input type="text" placeholder="Escribe tu mensaje..." style="
                 flex: 1;
-                padding: 8px;
+                padding: 12px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 margin-right: 8px;
+                font-size: 14px;
             ">
             <button style="
                 padding: 8px 15px;
-                background: #007bff;
+                background: #6B4E71;
                 color: white;
                 border: none;
                 border-radius: 4px;
                 cursor: pointer;
+                font-weight: bold;
+                transition: background 0.3s;
             ">Enviar</button>
         `;
 
@@ -89,13 +97,14 @@
             width: 60px;
             height: 60px;
             border-radius: 30px;
-            background: #007bff;
+            background: #6B4E71;
             color: white;
             border: none;
             font-size: 24px;
             cursor: pointer;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 1001;
+            z-index: 10000;
+            transition: transform 0.3s;
         `;
         
         document.body.appendChild(container);
@@ -105,8 +114,14 @@
         chatButton.onclick = () => {
             const isVisible = container.style.display === 'flex';
             container.style.display = isVisible ? 'none' : 'flex';
+            chatButton.style.transform = isVisible ? 'scale(1)' : 'scale(0)';
             if (!isVisible) {
                 inputArea.querySelector('input').focus();
+                // Mostrar mensaje de bienvenida si es la primera vez
+                if (!container.dataset.initialized) {
+                    addMessage('¡Hola! Soy el asistente virtual de Arbell. ¿En qué puedo ayudarte?', false);
+                    container.dataset.initialized = 'true';
+                }
             }
         };
 
@@ -130,18 +145,21 @@
         const sendButton = inputArea.querySelector('button');
         const input = inputArea.querySelector('input');
         
-        sendButton.onclick = () => {
+        const handleSendMessage = () => {
             const message = input.value.trim();
             if (message) {
                 addMessage(message, true);
                 input.value = '';
+                input.focus();
                 sendMessage(message);
             }
         };
 
+        sendButton.onclick = handleSendMessage;
+
         input.onkeypress = (e) => {
             if (e.key === 'Enter') {
-                sendButton.click();
+                handleSendMessage();
             }
         };
 
@@ -160,39 +178,44 @@
         const messageDiv = document.createElement('div');
         messageDiv.style.cssText = `
             margin: 10px 0;
-            padding: 10px;
+            padding: 12px;
             border-radius: 10px;
             max-width: 80%;
-            ${isUser ? 'margin-left: auto; background: #007bff; color: white;' : 'background: #f0f0f0;'}
+            word-wrap: break-word;
+            ${isUser ? 
+                'margin-left: auto; background: #6B4E71; color: white;' : 
+                'background: white; border: 1px solid #eee; box-shadow: 0 1px 2px rgba(0,0,0,0.1);'}
         `;
         messageDiv.textContent = message;
         messagesContainer.appendChild(messageDiv);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    // Función para obtener el store_id de la URL
-    function getStoreIdFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('store_id');
+    // Función para obtener el store_id
+    function getStoreId() {
+        return window.Tiendanube?.store?.id || 
+               new URLSearchParams(window.location.search).get('store_id');
     }
 
     // Función para enviar mensaje
     async function sendMessage(message) {
         if (!message.trim()) return;
         
-        const storeId = getStoreIdFromUrl() || window.Tiendanube?.store?.id;
+        const storeId = getStoreId();
         if (!storeId) {
-            addMessage('Error: No se pudo identificar la tienda. Por favor, contacta al soporte.');
+            addMessage('Error: No se pudo identificar la tienda. Por favor, contacta al soporte.', false);
             return;
         }
 
         try {
-            addMessage('Procesando tu mensaje...', false);
+            const loadingMessage = 'Procesando tu mensaje...';
+            addMessage(loadingMessage, false);
             
             const response = await fetch(`${config.apiUrl}/api/assistant`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-App-Version': config.version
                 },
                 body: JSON.stringify({ 
                     message,
@@ -204,7 +227,7 @@
             
             // Remove loading message
             const messagesContainer = document.querySelector(`#${config.chatbotContainer} > div:nth-child(2)`);
-            if (messagesContainer) {
+            if (messagesContainer && messagesContainer.lastChild.textContent === loadingMessage) {
                 messagesContainer.removeChild(messagesContainer.lastChild);
             }
 
@@ -212,7 +235,7 @@
                 throw new Error(data.error || 'Error en la comunicación con el servidor');
             }
 
-            addMessage(data.message || 'Lo siento, ocurrió un error inesperado.', false);
+            addMessage(data.message || data.response || 'Lo siento, ocurrió un error inesperado.', false);
             
         } catch (error) {
             console.error('Error:', error);
@@ -220,22 +243,30 @@
         }
     }
 
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChatbot);
+    } else {
+        initChatbot();
+    }
+
     // Función para inicializar el chatbot
     function initChatbot() {
-        const storeId = getStoreIdFromUrl() || window.Tiendanube?.store?.id;
+        const storeId = getStoreId();
         
         if (!storeId) {
             console.error('Error: ID de tienda no proporcionado');
             return;
         }
 
-        const ui = createChatbotUI();
+        createChatbotUI();
         
         // Initialize connection with backend
         fetch(`${config.apiUrl}/api/store/init`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-App-Version': config.version
             },
             body: JSON.stringify({
                 id: storeId,
@@ -246,18 +277,9 @@
         .then(response => response.json())
         .then(data => {
             console.log('Arbell: Chatbot inicializado correctamente');
-            addMessage('¡Hola! Soy el asistente virtual de Arbell. ¿En qué puedo ayudarte?', false);
         })
         .catch(error => {
-            console.error('Arbell: Error al inicializar el chatbot', error);
-            addMessage('Lo siento, hay un problema de conexión. Por favor, intenta más tarde.', false);
+            console.error('Error al inicializar el chatbot:', error);
         });
-    }
-
-    // Load script when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initChatbot);
-    } else {
-        initChatbot();
     }
 })(); 
