@@ -11,6 +11,12 @@ const tiendanubeConfig = {
     redirectUri: process.env.TIENDANUBE_REDIRECT_URI || "https://ai-cosmetik-production.up.railway.app/auth-success.html"
 };
 
+// Ruta para iniciar el proceso de autenticación
+router.get('/auth', (req, res) => {
+    const authUrl = `https://www.tiendanube.com/apps/authorize/token?client_id=${tiendanubeConfig.clientId}&response_type=code&redirect_uri=${encodeURIComponent(tiendanubeConfig.redirectUri)}`;
+    res.redirect(authUrl);
+});
+
 // Ruta para manejar el callback de autenticación
 router.get('/callback', async (req, res) => {
     const { code } = req.query;
