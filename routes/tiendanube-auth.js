@@ -60,4 +60,63 @@ router.get('/callback', async (req, res) => {
     }
 });
 
+// Webhook para eliminación de datos de tienda
+router.post('/webhooks/store/redact', async (req, res) => {
+    try {
+        const { store_id } = req.body;
+        logger.info('Solicitud de eliminación de datos de tienda recibida', { store_id });
+        
+        // Aquí implementarías la lógica para eliminar los datos de la tienda
+        // Por ejemplo, eliminar tokens, configuraciones, etc.
+        
+        res.json({ status: 'success', message: 'Datos de tienda programados para eliminación' });
+    } catch (error) {
+        logger.error('Error en webhook store/redact', { error: error.message });
+        res.status(500).json({ status: 'error', message: 'Error al procesar la solicitud' });
+    }
+});
+
+// Webhook para eliminación de datos de clientes
+router.post('/webhooks/customers/redact', async (req, res) => {
+    try {
+        const { store_id, customer_id } = req.body;
+        logger.info('Solicitud de eliminación de datos de cliente recibida', { store_id, customer_id });
+        
+        // Aquí implementarías la lógica para eliminar los datos del cliente
+        // Por ejemplo, eliminar historial de conversaciones, preferencias, etc.
+        
+        res.json({ status: 'success', message: 'Datos de cliente programados para eliminación' });
+    } catch (error) {
+        logger.error('Error en webhook customers/redact', { error: error.message });
+        res.status(500).json({ status: 'error', message: 'Error al procesar la solicitud' });
+    }
+});
+
+// Webhook para solicitud de datos de clientes
+router.post('/webhooks/customers/data-request', async (req, res) => {
+    try {
+        const { store_id, customer_id } = req.body;
+        logger.info('Solicitud de datos de cliente recibida', { store_id, customer_id });
+        
+        // Aquí implementarías la lógica para recopilar los datos del cliente
+        // Por ejemplo, historial de conversaciones, preferencias, etc.
+        
+        res.json({ 
+            status: 'success', 
+            message: 'Solicitud de datos recibida',
+            data: {
+                customer_id,
+                store_id,
+                // Aquí irían los datos recopilados
+                conversations: [],
+                preferences: {},
+                created_at: new Date().toISOString()
+            }
+        });
+    } catch (error) {
+        logger.error('Error en webhook customers/data-request', { error: error.message });
+        res.status(500).json({ status: 'error', message: 'Error al procesar la solicitud' });
+    }
+});
+
 module.exports = router; 
