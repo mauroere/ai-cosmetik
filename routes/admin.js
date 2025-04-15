@@ -83,8 +83,13 @@ router.get('/links', authenticateToken, async (req, res) => {
     }
 });
 
+// Servir la página principal del admin
+router.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'index.html'));
+});
+
 // Ruta para obtener la configuración
-router.get('/config', async (req, res) => {
+router.get('/api/config', async (req, res) => {
     try {
         const { store_id } = req.query;
         if (!store_id) {
@@ -105,7 +110,7 @@ router.get('/config', async (req, res) => {
 });
 
 // Ruta para guardar la configuración
-router.post('/config', async (req, res) => {
+router.post('/api/config', async (req, res) => {
     try {
         const { store_id, welcomeMessage, primaryColor, position } = req.body;
         
@@ -124,7 +129,7 @@ router.post('/config', async (req, res) => {
 });
 
 // Ruta para obtener estadísticas
-router.get('/stats', async (req, res) => {
+router.get('/api/stats', async (req, res) => {
     try {
         const { store_id } = req.query;
         

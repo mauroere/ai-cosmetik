@@ -14,7 +14,7 @@
   "platform": "tiendanube",
   "main_locale": "es",
   "locales": ["es", "pt"],
-  "admin_url": "https://ai-cosmetik-production.up.railway.app/admin",
+  "admin_url": "https://ai-cosmetik-production.up.railway.app/admin?store_id={store_id}",
   "features": {
     "products": ["read"],
     "orders": ["read"],

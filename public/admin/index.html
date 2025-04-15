@@ -108,7 +108,7 @@
             const storeId = new URLSearchParams(window.location.search).get('store_id');
             
             // Load configuration
-            fetch(`/api/admin/config?store_id=${storeId}`)
+            fetch(`/admin/api/config?store_id=${storeId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('welcome-message').value = data.welcomeMessage || '';
@@ -118,7 +118,7 @@
                 .catch(console.error);
 
             // Load statistics
-            fetch(`/api/admin/stats?store_id=${storeId}`)
+            fetch(`/admin/api/stats?store_id=${storeId}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('total-conversations').textContent = data.totalConversations || 0;
@@ -137,7 +137,7 @@
                     store_id: storeId
                 };
 
-                fetch('/api/admin/config', {
+                fetch('/admin/api/config', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

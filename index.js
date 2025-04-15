@@ -572,26 +572,24 @@ app.get('/api/stats', authenticateToken, (req, res) => {
     }
 });
 
-// Manejo de errores global
+// Ruta principal
+app.get('/', (req, res) => {
+    res.send('Asistente IA - API Running');
+});
+
+// Manejo de errores
 app.use((err, req, res, next) => {
-    logger.error('Error no manejado', { 
-        error: err.message,
-        stack: err.stack
-    });
-    
-    res.status(500).json({ 
-        error: 'Error interno del servidor',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Ha ocurrido un error'
-    });
+    logger.error('Error no manejado', { error: err.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
 });
 
 app.use('/api/products', productsRouter);
 app.use('/api/store', storeRouter);
-app.use('/api/admin', adminRouter);
+app.use('/admin', adminRouter);
 app.use('/api/tiendanube', tiendanubeAuthRouter);
 app.use('/api/webhooks', webhooksRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    logger.info(`Servidor corriendo en puerto ${PORT}`);
+    logger.info(`Servidor iniciado en puerto ${PORT}`);
 }); 
