@@ -2,41 +2,67 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
-// Servir páginas de administración
-router.get('/config', (req, res) => {
+// Middleware de autenticación
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        return res.redirect('/admin/login?store_id=' + req.query.store_id);
+    }
+    
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            logger.warn('Token inválido o expirado', { error: err.message });
+            return res.redirect('/admin/login?store_id=' + req.query.store_id);
+        }
+        
+        req.user = user;
+        next();
+    });
+};
+
+// Ruta de login
+router.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'login.html'));
+});
+
+// Servir páginas de administración (protegidas)
+router.get('/config', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'config.html'));
 });
 
-router.get('/metrics', (req, res) => {
+router.get('/metrics', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'metrics.html'));
 });
 
-router.get('/conversations', (req, res) => {
+router.get('/conversations', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'conversations.html'));
 });
 
 // Configuración de links de administrador
 const adminLinks = [
     {
-        location: "Listado de páginas",
+        location: "Configuración",
         url: "/admin/config",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     },
     {
-        location: "Listado de productos",
+        location: "Métricas",
         url: "/admin/metrics",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     },
     {
-        location: "Listado de órdenes",
+        location: "Conversaciones",
         url: "/admin/conversations",
         regions: ["AR", "BR", "CL", "CO", "MX", "PE", "UY"]
     }
 ];
 
-// Obtener links de administrador
-router.get('/links', async (req, res) => {
+// Obtener links de administrador (protegido)
+router.get('/links', authenticateToken, async (req, res) => {
     try {
         const storeId = req.query.store_id;
         if (!storeId) {
