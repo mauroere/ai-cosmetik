@@ -92,7 +92,7 @@
                     // Redirigir al panel de administración
                     const urlParams = new URLSearchParams(window.location.search);
                     const storeId = urlParams.get('store_id');
-                    window.location.href = `/admin/config?store_id=${storeId}`;
+                    window.location.href = `/admin/${storeId}/config`;
                 } else {
                     errorMessage.style.display = 'block';
                 }

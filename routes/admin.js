@@ -10,13 +10,13 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
     
     if (!token) {
-        return res.redirect('/admin/login?store_id=' + req.query.store_id);
+        return res.redirect(`/admin/login/${req.params.store_id}`);
     }
     
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             logger.warn('Token inválido o expirado', { error: err.message });
-            return res.redirect('/admin/login?store_id=' + req.query.store_id);
+            return res.redirect(`/admin/login/${req.params.store_id}`);
         }
         
         req.user = user;
@@ -25,21 +25,26 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Ruta de login
-router.get('/login', (req, res) => {
+router.get('/login/:store_id', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'login.html'));
 });
 
 // Servir páginas de administración (protegidas)
-router.get('/config', authenticateToken, (req, res) => {
+router.get('/config/:store_id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'config.html'));
 });
 
-router.get('/metrics', authenticateToken, (req, res) => {
+router.get('/metrics/:store_id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'metrics.html'));
 });
 
-router.get('/conversations', authenticateToken, (req, res) => {
+router.get('/conversations/:store_id', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'conversations.html'));
+});
+
+// Servir la página principal del admin
+router.get('/:store_id', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'index.html'));
 });
 
 // Configuración de links de administrador
@@ -81,11 +86,6 @@ router.get('/links', authenticateToken, async (req, res) => {
         logger.error('Error al obtener links de administrador', { error: error.message });
         res.status(500).json({ error: 'Error al obtener links de administrador' });
     }
-});
-
-// Servir la página principal del admin
-router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'admin', 'index.html'));
 });
 
 // Ruta para obtener la configuración
