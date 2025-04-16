@@ -55,5 +55,6 @@
       ],
       "default": "bottom-right"
     }
-  }
+  },
+  "allowedDomains": ["ai-cosmetik-production.up.railway.app"]
 } 
